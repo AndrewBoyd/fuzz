@@ -1,0 +1,8 @@
+{
+	let foo = { 
+		x = 3;
+		let y = x + 2;
+	};
+	
+	let bar = 5;
+};
