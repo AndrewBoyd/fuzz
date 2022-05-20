@@ -22,27 +22,56 @@ namespace fuzz
 	//	{ fuzz_binary_operator::logical_or, "logical_or" },
 	//};
 
-	//std::string to_string(fuzz_boolean x) {
-	//	return fmt::format("boolean: {}", x.value);
-	//}
+	std::string to_string(Boolean x) {
+		return fmt::format("boolean: {}", x);
+	}
 
-	//std::string to_string(fuzz_number x) {
-	//	auto to_number = [](fuzz_number num) {
-	//		auto result = static_cast<double>(num.integer);
-	//		if (num.fraction.has_value()) {
-	//			auto as_string = string_utils::u8string_to_string(*num.fraction);
-	//			auto as_float = std::stod("0." + as_string);
-	//			result += as_float;
-	//		}
-	//		return result;
-	//	};
+	std::string to_string(Number x) {
+		return fmt::format("number: {}", x);
+	}
 
-	//	return fmt::format("number: {}", to_number(x));
-	//}
+	std::string to_string(String x) {
+		return fmt::format("string: \"{}\"", string_utils::u8_to_ascii(x));
+	}
 
-	//std::string to_string(fuzz_string x) {
-	//	return fmt::format("string: \"{}\"", string_utils::u8string_to_string(x.value));
-	//}
+	std::string to_string(Identifier x) {
+		return fmt::format("Identifier: \"{}\"", string_utils::u8_to_ascii(x.id));
+	}
+
+	std::string to_string(Primitive x) {
+		return std::visit([](auto value) {
+			return to_string(value);
+		}, x);
+	}
+
+	std::string to_string(Array)
+	{
+		return std::string();
+	}
+
+	std::string to_string(Block)
+	{
+		return std::string();
+	}
+
+	std::string to_string(Lambda)
+	{
+		return std::string();
+	}
+
+	std::string to_string(Expression x)
+	{
+		auto expr_ptr = x.get();
+		if (auto expr = dynamic_cast<PrimitiveExpression*>(expr_ptr))
+			return to_string(*expr);
+
+		return "Unknown Expression";
+	}
+
+	std::string to_string(PrimitiveExpression x)
+	{
+		return to_string(x.primitive);
+	}
 
 	//std::string to_string(fuzz_array x) {
 	//	auto strings = std::vector<std::string>{ };

@@ -4,12 +4,15 @@
 
 namespace fuzz
 {
-	//std::string to_string(fuzz_boolean);
-	//std::string to_string(fuzz_number); 
-	//std::string to_string(fuzz_string); 
-	//std::string to_string(fuzz_array);
-	//std::string to_string(fuzz_value); 
-	//std::string to_string(fuzz_binary_operator);
-	//std::string to_string(fuzz_binary_operation);
-	//std::string to_string(fuzz_expression);
+	std::string to_string(Boolean);
+	std::string to_string(Number); 
+	std::string to_string(String); 
+	std::string to_string(Identifier); 
+	std::string to_string(Primitive); 
+	std::string to_string(Array);
+	std::string to_string(Block);
+	std::string to_string(Lambda);
+
+	std::string to_string(Expression);
+	std::string to_string(PrimitiveExpression); 
 }

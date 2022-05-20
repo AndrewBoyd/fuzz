@@ -41,10 +41,11 @@ namespace fuzz_grammar
 			{
 				auto result = static_cast<double>(num);
 				if (frac.has_value()) {
-					auto as_string = string_utils::u8string_to_string(*frac);
+					auto as_string = string_utils::u8_to_ascii(*frac);
 					auto as_float = std::stod("0." + as_string);
 					result += as_float;
 				}
+				return result;
 			});
 	};
 
@@ -87,11 +88,14 @@ namespace fuzz_grammar
 		static constexpr auto value = lexy::as_string<fz::String, lexy::utf8_encoding>;
 	};
 
+	// TODO: Identifiers need to use the unicode database.
 	struct Identifier
 	{
 		static constexpr auto rule
-			= dsl::identifier(dsl::unicode::xid_start_underscore, dsl::unicode::xid_continue);
-		static constexpr auto value = lexy::as_string<fz::string_t, lexy::utf8_encoding>;
+			= dsl::identifier(dsl::ascii::alpha, dsl::ascii::alnum);
+		static constexpr auto value 
+			= lexy::as_string<fz::String, lexy::utf8_encoding> 
+			| lexy::construct<fz::Identifier>;
 	};
 
 	struct Primitive : lexy::transparent_production {

@@ -62,31 +62,40 @@ namespace fuzz
 		Boolean,
 		Number,
 		String,
-		Array,
-		Block,
-		Lambda,
+		//Array,
+		//Block,
+		//Lambda,
 		Identifier
 	>;
 
 	// EXPRESSIONS
 
-	struct Expression_base{};
+	struct Expression_base{
+		virtual ~Expression_base() = default;
+	};
+
 	struct BinaryOperation : public Expression_base {
 		BinaryOperator operation;
 		Expression lhs;
 		Expression rhs;
 	};
+	
 	struct Evaluation : public Expression_base{
 		std::variant<Identifier, Block> to_evaluate;
 		std::vector<Expression> parameter_pack;
 	};
+
 	struct PrimitiveExpression : public Expression_base {
 		Primitive primitive;
+
+		auto operator<=>(PrimitiveExpression const& other) const = default;
 	};
 
 	// STATEMENTS
 
-	struct Statement_base {};
+	struct Statement_base {
+		virtual ~Statement_base() = default;
+	};
 	struct AssignmentStatement : Statement_base {
 		AssignmentQualifier qualifier;
 		Identifier name;
