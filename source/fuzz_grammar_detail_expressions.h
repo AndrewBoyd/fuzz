@@ -35,15 +35,14 @@ namespace fuzz_grammar
 				| dsl::error<Err_ExpectedOperand>;
 		}();
 
-		//struct ProductExpression : dsl::infix_op_left
-		//{
-		//	static constexpr auto op = [] {
-		//		return dsl::op<fz::BinaryOperator::multiply>(LEXY_LIT("*"))
-		//			/ dsl::op<fz::BinaryOperator::divide>(LEXY_LIT("/"))
-		//			/ dsl::op<fz::BinaryOperator::modulo>(LEXY_LIT("%"));
-		//	}();
-		//	using operand = dsl::atom;
-		//};
+		struct ProductExpression : dsl::infix_op_left
+		{
+			static constexpr auto op 
+					= dsl::op<fz::BinaryOperator::multiply>(LEXY_LIT("*"))
+					/ dsl::op<fz::BinaryOperator::divide>(LEXY_LIT("/"))
+					/ dsl::op<fz::BinaryOperator::modulo>(LEXY_LIT("%"));
+			using operand = dsl::atom;
+		};
 
 		//struct SumExpression : dsl::infix_op_left
 		//{
@@ -68,30 +67,13 @@ namespace fuzz_grammar
 		//	using operand = SumExpression;
 		//};
 
-		using operation = dsl::atom;
+		using operation = ProductExpression;
 
-		//static constexpr auto value =
-		//	// We need a sink as the comparison expression generates a list.
-		//	lexy::fold_inplace<std::unique_ptr<ast::expr_comparison>>(
-		//		[] { return std::make_unique<ast::expr_comparison>(); },
-		//		[](auto& node, ast::expr_ptr opr) { node->operands.push_back(LEXY_MOV(opr)); },
-		//		[](auto& node, ast::expr_comparison::op_t op) { node->ops.push_back(op); })
-		//	// The result of the list feeds into a callback that handles all other cases.
-		//	>> lexy::callback(
-		//		// atoms
-		//		lexy::forward<ast::expr_ptr>, lexy::new_<ast::expr_literal, ast::expr_ptr>,
-		//		lexy::new_<ast::expr_name, ast::expr_ptr>, lexy::new_<ast::expr_call, ast::expr_ptr>,
-		//		// unary/binary operators
-		//		lexy::new_<ast::expr_unary_arithmetic, ast::expr_ptr>,
-		//		lexy::new_<ast::expr_binary_arithmetic, ast::expr_ptr>,
-		//		// conditional and assignment
-		//		lexy::new_<ast::expr_if, ast::expr_ptr>,
-		//		lexy::new_<ast::expr_assignment, ast::expr_ptr>);
-
-		static constexpr auto value = lexy::callback(
-			lexy::forward< fz::Expression >,
-			lexy::new_< fz::PrimitiveExpression, fz::Expression >,
-			lexy::new_< fz::BinaryOperation, fz::Expression >
+		static constexpr auto value = lexy::callback<fz::Expression>(
+			[](fz::Expression lhs, fz::BinaryOperator op, fz::Expression rhs) -> fz::Expression {
+				return fz::BinaryOperation(lhs, op, rhs);
+			}
+			, lexy::forward< fz::Expression >
 		);
 	};
 }

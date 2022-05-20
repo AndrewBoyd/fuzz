@@ -74,14 +74,23 @@ namespace fuzz
 		virtual ~Expression_base() = default;
 	};
 
-	struct BinaryOperation : public Expression_base {
+	struct BinaryOperation : public Expression_base 
+	{
+		explicit BinaryOperation(Expression l, BinaryOperator op, Expression r) 
+			: Expression_base()
+			, operation(op)
+			, lhs(std::move(l))
+			, rhs(std::move(r))
+		{}
+
 		BinaryOperator operation;
 		Expression lhs;
 		Expression rhs;
 	};
 	
-	struct Evaluation : public Expression_base{
-		std::variant<Identifier, Block> to_evaluate;
+	struct Evaluation : public Expression_base
+	{
+		Expression to_evaluate;
 		std::vector<Expression> parameter_pack;
 	};
 

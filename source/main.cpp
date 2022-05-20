@@ -43,6 +43,10 @@ void testFuzz() {
 	test<fuzz_grammar::Expression>(u8"Bartholemew");
 	test<fuzz_grammar::Expression>(u8"PiByFour");
 	test<fuzz_grammar::Expression>(u8"(true)");
+	test<fuzz_grammar::Expression>(u8"((true))");
+	test<fuzz_grammar::Expression>(u8"5*3");
+	test<fuzz_grammar::Expression>(u8"(1/sqrt5)%3");
+	test<fuzz_grammar::Expression>(u8"5+3");
 
 	
 	//test<fuzz_grammar::PrimitiveExpression>(u8"true");

@@ -4,23 +4,41 @@
 
 namespace fuzz
 {
-	//static auto const kToString_fuzz_binary_operator =
-	//	std::map<fuzz_binary_operator, std::string>
-	//{
-	//	{ fuzz_binary_operator::add, "add" },
-	//	{ fuzz_binary_operator::subtract, "subtract" },
-	//	{ fuzz_binary_operator::multiply, "multiply" },
-	//	{ fuzz_binary_operator::divide, "divide" },
-	//	{ fuzz_binary_operator::modulo, "modulo" },
-	//	{ fuzz_binary_operator::less_than, "less_than" },
-	//	{ fuzz_binary_operator::less_than_or_equal, "less_than_or_equal" },
-	//	{ fuzz_binary_operator::greater_than, "greater_than" },
-	//	{ fuzz_binary_operator::greater_than_or_equal, "greater_than_or_equal" },
-	//	{ fuzz_binary_operator::equal, "equal" },
-	//	{ fuzz_binary_operator::not_equal, "not_equal" },
-	//	{ fuzz_binary_operator::logical_and, "logical_and" },
-	//	{ fuzz_binary_operator::logical_or, "logical_or" },
-	//};
+	static auto const kToString_fuzz_binary_operator =
+		std::map<BinaryOperator, std::string>
+	{
+		{ BinaryOperator::add, "add" },
+		{ BinaryOperator::subtract, "subtract" },
+		{ BinaryOperator::multiply, "multiply" },
+		{ BinaryOperator::divide, "divide" },
+		{ BinaryOperator::modulo, "modulo" },
+		{ BinaryOperator::less_than, "less_than" },
+		{ BinaryOperator::less_than_or_equal, "less_than_or_equal" },
+		{ BinaryOperator::greater_than, "greater_than" },
+		{ BinaryOperator::greater_than_or_equal, "greater_than_or_equal" },
+		{ BinaryOperator::equal, "equal" },
+		{ BinaryOperator::not_equal, "not_equal" },
+		{ BinaryOperator::logical_and, "logical_and" },
+		{ BinaryOperator::logical_or, "logical_or" },
+	};
+
+	static auto const kBinaryOperatorShortForm =
+		std::map<BinaryOperator, std::string>
+	{
+		{ BinaryOperator::add, "+" },
+		{ BinaryOperator::subtract, "-" },
+		{ BinaryOperator::multiply, "*" },
+		{ BinaryOperator::divide, "/" },
+		{ BinaryOperator::modulo, "%" },
+		{ BinaryOperator::less_than, "<" },
+		{ BinaryOperator::less_than_or_equal, "<=" },
+		{ BinaryOperator::greater_than, ">" },
+		{ BinaryOperator::greater_than_or_equal, ">=" },
+		{ BinaryOperator::equal, "==" },
+		{ BinaryOperator::not_equal, "!=" },
+		{ BinaryOperator::logical_and, "&&" },
+		{ BinaryOperator::logical_or, "||" },
+	};
 
 	std::string to_string(Boolean x) {
 		return fmt::format("boolean: {}", x);
@@ -64,6 +82,8 @@ namespace fuzz
 		auto expr_ptr = x.get();
 		if (auto expr = dynamic_cast<PrimitiveExpression*>(expr_ptr))
 			return to_string(*expr);
+		if (auto expr = dynamic_cast<BinaryOperation*>(expr_ptr))
+			return to_string(*expr);
 
 		return "Unknown Expression";
 	}
@@ -71,6 +91,14 @@ namespace fuzz
 	std::string to_string(PrimitiveExpression x)
 	{
 		return to_string(x.primitive);
+	}
+
+	std::string to_string(BinaryOperation x)
+	{
+		return fmt::format("({1} {0} {2})",
+			kBinaryOperatorShortForm.at(x.operation),
+			to_string(x.lhs),
+			to_string(x.rhs));
 	}
 
 	//std::string to_string(fuzz_array x) {
@@ -97,10 +125,7 @@ namespace fuzz
 
 	//std::string to_string(fuzz_binary_operation x)
 	//{
-	//	return fmt::format("({1} {0} {2})",
-	//		to_string(x.lhs),
-	//		kToString_fuzz_binary_operator.at(x.operation),
-	//		to_string(x.rhs));
+	//	
 	//}
 
 	//std::string to_string(fuzz_expression x)
