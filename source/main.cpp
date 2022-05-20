@@ -34,14 +34,15 @@ void test(std::string input_string)
 void testFuzz() {
 	namespace fz = fuzz;
 	namespace fg = fuzz_grammar;
-	test<fuzz_grammar::PrimitiveExpression>(u8"true");
-	test<fuzz_grammar::PrimitiveExpression>(u8"false");
-	test<fuzz_grammar::PrimitiveExpression>(u8"3.141592654");
-	test<fuzz_grammar::PrimitiveExpression>(u8"-3");
-	test<fuzz_grammar::PrimitiveExpression>(u8"\"Hello, World\"");
-	test<fuzz_grammar::PrimitiveExpression>(u8"\"Greek: αβγδ; German: Übergrößenträger\"");
-	test<fuzz_grammar::PrimitiveExpression>(u8"Bartholemew");
-	test<fuzz_grammar::PrimitiveExpression>(u8"PiByFour");
+	test<fuzz_grammar::Expression>(u8"true");
+	test<fuzz_grammar::Expression>(u8"false");
+	test<fuzz_grammar::Expression>(u8"3.141592654");
+	test<fuzz_grammar::Expression>(u8"-3");
+	test<fuzz_grammar::Expression>(u8"\"Hello, World\"");
+	test<fuzz_grammar::Expression>(u8"\"Greek: αβγδ; German: Übergrößenträger\"");
+	test<fuzz_grammar::Expression>(u8"Bartholemew");
+	test<fuzz_grammar::Expression>(u8"PiByFour");
+	test<fuzz_grammar::Expression>(u8"(true)");
 
 	
 	//test<fuzz_grammar::PrimitiveExpression>(u8"true");
