@@ -47,6 +47,8 @@ void testFuzz() {
 	test<fuzz_grammar::Expression>(u8"5*3");
 	test<fuzz_grammar::Expression>(u8"(1/sqrt5)%3");
 	test<fuzz_grammar::Expression>(u8"5+3");
+	test<fuzz_grammar::Expression>(u8"5+3 > (1+sqrt5)/2");
+	test<fuzz_grammar::Expression>(u8"myText == \"Hello, World!\"");
 
 	
 	//test<fuzz_grammar::PrimitiveExpression>(u8"true");

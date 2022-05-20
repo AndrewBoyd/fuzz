@@ -90,7 +90,7 @@ namespace fuzz
 
 	std::string to_string(PrimitiveExpression x)
 	{
-		return to_string(x.primitive);
+		return fmt::format("<{}>", to_string(x.primitive));
 	}
 
 	std::string to_string(BinaryOperation x)
