@@ -36,10 +36,7 @@ namespace fuzz
 	};
 
 	enum class AssignmentQualifier {
-		null, 
-		temp, 
-		let, 
-		require
+		temp, let
 	};
 
 	// PRIMITIVES
@@ -105,15 +102,14 @@ namespace fuzz
 	struct Statement_base {
 		virtual ~Statement_base() = default;
 	};
+
 	struct AssignmentStatement : Statement_base {
-		AssignmentQualifier qualifier;
+		std::optional< AssignmentQualifier > qualifier;
 		Identifier name;
 		Expression expression;
 	};
+	
 	struct ReturnStatement : Statement_base {
-		Expression expression;
-	};
-	struct ExpressionStatement : Statement_base {
 		Expression expression;
 	};
 

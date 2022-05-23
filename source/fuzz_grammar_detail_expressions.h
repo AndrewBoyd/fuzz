@@ -66,7 +66,7 @@ namespace fuzz_grammar
 
 		using operation = ComparisonExpression;
 
-		static constexpr auto whitespace = dsl::ascii::blank | (dsl::backslash >> dsl::newline);
+		//static constexpr auto whitespace = dsl::ascii::blank | (dsl::backslash >> dsl::newline);
 		
 		static constexpr auto value = lexy::callback<fz::Expression>(
 			[](fz::Expression lhs, fz::BinaryOperator op, fz::Expression rhs) -> fz::Expression {

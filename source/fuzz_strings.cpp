@@ -40,6 +40,13 @@ namespace fuzz
 		{ BinaryOperator::logical_or, "||" },
 	};
 
+	static auto const kToString_fuzz_assignment_qualifier =
+		std::map<AssignmentQualifier, std::string>
+	{
+		{ AssignmentQualifier::let, "let" },
+		{ AssignmentQualifier::temp, "temp" },
+	};
+
 	std::string to_string(Boolean x) {
 		return fmt::format("boolean: {}", x);
 	}
@@ -101,6 +108,43 @@ namespace fuzz
 			to_string(x.rhs));
 	}
 
+	std::string to_string(AssignmentQualifier x)
+	{
+		return kToString_fuzz_assignment_qualifier.at(x);
+	}
+
+	std::string to_string(Statement x)
+	{
+		auto statement_ptr = x.get();
+		if (auto statement = dynamic_cast<AssignmentStatement*>(statement_ptr))
+			return to_string(*statement);
+		if (auto statement = dynamic_cast<ReturnStatement*>(statement_ptr))
+			return to_string(*statement);
+
+		return "Unknown Statement";
+	}
+
+	std::string to_string(AssignmentStatement x)
+	{
+		if (x.qualifier) 
+		{
+			return fmt::format("{} {} = {};",
+				to_string(*x.qualifier),
+				to_string(x.name),
+				to_string(x.expression));
+		}
+
+		return fmt::format("{} = {};",
+			to_string(x.name),
+			to_string(x.expression));
+	}
+
+	std::string to_string(ReturnStatement x)
+	{
+		return fmt::format("return {};",
+			to_string(x.expression));
+	}
+
 	//std::string to_string(fuzz_array x) {
 	//	auto strings = std::vector<std::string>{ };
 	//	strings.reserve(x.values.size());
@@ -109,30 +153,6 @@ namespace fuzz
 	//	}
 	//	auto concat = string_utils::concat(strings, ", ");
 	//	return fmt::format("array[{}]: [{}]", x.values.size(), concat);
-	//}
-
-	//std::string to_string(fuzz_value x) {
-	//	auto value_string = std::visit([](auto value) {
-	//		return to_string(value);
-	//		}, x->value);
-	//	return fmt::format("<{}>", value_string);
-	//}
-
-	//std::string to_string(fuzz_binary_operator x)
-	//{
-	//	return fmt::format("|binop: {}|", kToString_fuzz_binary_operator.at(x));
-	//}
-
-	//std::string to_string(fuzz_binary_operation x)
-	//{
-	//	
-	//}
-
-	//std::string to_string(fuzz_expression x)
-	//{
-	//	return std::visit([](auto value) {
-	//		return to_string(value);
-	//	}, x->value);
 	//}
 
 }
