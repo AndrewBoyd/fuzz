@@ -88,11 +88,40 @@ namespace fuzz_grammar
 		static constexpr auto value = lexy::as_string<fz::String, lexy::utf8_encoding>;
 	};
 
+	struct Array
+	{
+		struct UnexpectedTrailingComma {
+			static constexpr auto name = "Unexpected trailing comma";
+		};
+
+		static constexpr auto seperator = dsl::sep(dsl::comma).trailing_error<UnexpectedTrailingComma>;
+		static constexpr auto rule = dsl::square_bracketed.opt_list(dsl::recurse<Expression>, seperator);
+		static constexpr auto value = lexy::as_list<fz::Array>;
+	};
+
+	struct Block
+	{
+		static constexpr auto seperator = dsl::trailing_sep(dsl::semicolon);
+		static constexpr auto rule
+			= dsl::curly_bracketed.list(dsl::recurse<Expression>, seperator);
+		static constexpr auto value
+			= lexy::as_list< fuzz::Array >
+			>> lexy::callback<fz::Block>([] (auto statements)
+			{
+				auto result = fz::Block{};
+				result.statements = std::move(statements);
+				return result;
+			});
+		
+
+//		static constexpr auto value = lexy::constant<int>(3);
+	};
+
 	// TODO: Identifiers need to use the unicode database.
 	struct Identifier
 	{
 		static constexpr auto rule
-			= dsl::identifier(dsl::ascii::alpha, dsl::ascii::alnum);
+			= dsl::identifier(dsl::ascii::alpha, dsl::ascii::alpha_digit_underscore);
 		static constexpr auto value 
 			= lexy::as_string<fz::String, lexy::utf8_encoding> 
 			| lexy::construct<fz::Identifier>;
@@ -103,6 +132,8 @@ namespace fuzz_grammar
 			= dsl::p<Boolean>
 			| dsl::p<Number>
 			| dsl::p<String>
+			| dsl::p<Array>
+			| dsl::p<Block>
 			| dsl::p<Identifier>;
 
 		static constexpr auto value = lexy::forward<fz::Primitive>;

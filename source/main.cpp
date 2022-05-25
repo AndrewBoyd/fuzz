@@ -40,6 +40,13 @@ void testFuzz() {
 	test(u8"return 3+4*q");
 	test(u8"let myCoolStuff := 3+4*q");
 	test(u8"temp lads := 3+4*q");
+	test(u8"[1, 2, cool_beans, 3+38]");
+	test(u8"{name; value; [3,2,1]; }");
+
+	test(u8"{{nested}}");
+	test(u8"[[nested]]");
+	test(u8"[{nested}]");
+	test(u8"{[nested]}");
 }
 
 int main() 

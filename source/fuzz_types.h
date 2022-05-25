@@ -60,8 +60,8 @@ namespace fuzz
 		Boolean,
 		Number,
 		String,
-		//Array,
-		//Block,
+		Array,
+		Block,
 		//Lambda,
 		Identifier
 	>;

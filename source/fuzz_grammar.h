@@ -21,6 +21,7 @@ namespace fuzz_grammar {
 	struct String;
 	struct Identifier;
 	struct Primitive;
+	struct Array;
 	
 	// fuzz_grammar_detail_expressions.h
 	struct Expression;

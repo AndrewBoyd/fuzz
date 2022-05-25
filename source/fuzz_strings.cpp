@@ -70,14 +70,27 @@ namespace fuzz
 		}, x);
 	}
 
-	std::string to_string(Array)
+	std::string to_string(Array x)
 	{
-		return std::string();
+		auto strings = std::vector<std::string>{ };
+		strings.reserve(x.size());
+		for (auto v : x) {
+			strings.push_back(to_string(v));
+		}
+		auto concat = string_utils::concat(strings, ", ");
+		return fmt::format("array[{}]: [{}]", x.size(), concat);
 	}
 
-	std::string to_string(Block)
+	std::string to_string(Block x)
 	{
-		return std::string();
+		auto & statements = x.statements;
+		auto strings = std::vector<std::string>{ };
+		strings.reserve(statements.size());
+		for (auto statement : statements) {
+			strings.push_back(to_string(statement));
+		}
+		auto concat = string_utils::concat(strings, "; ");
+		return fmt::format("block: {{ {} }}", concat);
 	}
 
 	std::string to_string(Lambda)
@@ -127,14 +140,5 @@ namespace fuzz
 			to_string(x.rhs));
 	}
 
-	//std::string to_string(fuzz_array x) {
-	//	auto strings = std::vector<std::string>{ };
-	//	strings.reserve(x.values.size());
-	//	for (auto v : x.values) {
-	//		strings.push_back(to_string(v));
-	//	}
-	//	auto concat = string_utils::concat(strings, ", ");
-	//	return fmt::format("array[{}]: [{}]", x.values.size(), concat);
-	//}
 
 }
