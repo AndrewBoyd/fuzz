@@ -16,9 +16,6 @@ namespace fuzz
 	struct Expression_base;
 	using Expression = stdish::value_ptr<Expression_base>;
 
-	struct Statement_base;
-	using Statement = stdish::value_ptr<Statement_base>;
-
 	enum class BinaryOperator {
 		add, 
 		subtract, 
@@ -35,9 +32,13 @@ namespace fuzz
 		logical_or
 	};
 
-	enum class AssignmentQualifier {
-		temp, let
+	enum class PrefixKeyword {
+		return_,
+		temp, 
+		let,
 	};
+
+	struct Assignment_t {};
 
 	// PRIMITIVES
 
@@ -46,7 +47,7 @@ namespace fuzz
 	using String = string_t;
 	using Array = std::vector<Expression>;
 	using Block = struct {
-		std::vector<Statement> statements;
+		std::vector<Expression> statements;
 	};
 	using Lambda = struct {
 		std::vector<string_t> free_variables;
@@ -84,7 +85,31 @@ namespace fuzz
 		Expression lhs;
 		Expression rhs;
 	};
-	
+
+	struct KeywordOperation : public Expression_base
+	{
+		explicit KeywordOperation(PrefixKeyword kw, Expression rhs)
+			: Expression_base()
+			, keyword(kw)
+			, expr(std::move(rhs)) 
+		{};
+
+		PrefixKeyword keyword;
+		Expression expr;
+	};
+
+	struct AssignOperation : public Expression_base
+	{
+		explicit AssignOperation(Expression l, Expression r)
+			: Expression_base()
+			, lhs(std::move(l))
+			, rhs(std::move(r))
+		{};
+
+		Expression lhs;
+		Expression rhs;
+	};
+
 	struct Evaluation : public Expression_base
 	{
 		Expression to_evaluate;
@@ -95,22 +120,6 @@ namespace fuzz
 		Primitive primitive;
 
 		auto operator<=>(PrimitiveExpression const& other) const = default;
-	};
-
-	// STATEMENTS
-
-	struct Statement_base {
-		virtual ~Statement_base() = default;
-	};
-
-	struct AssignmentStatement : Statement_base {
-		std::optional< AssignmentQualifier > qualifier;
-		Identifier name;
-		Expression expression;
-	};
-	
-	struct ReturnStatement : Statement_base {
-		Expression expression;
 	};
 
 	using Program = Block;

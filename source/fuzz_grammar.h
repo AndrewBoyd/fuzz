@@ -26,13 +26,6 @@ namespace fuzz_grammar {
 	struct Expression;
 	struct PrimitiveExpression;
 	struct NestedExpression;
-
-	// fuzz_grammar_detail_statements.h
-	struct AssignmentQualifier;
-	struct AssignmentStatement;
-	struct ReturnStatement;
-	struct Statement;
-
 }
 
 #include "fuzz_grammar_detail_literals.h"

@@ -64,15 +64,36 @@ namespace fuzz_grammar
 			using operand = SumExpression;
 		};
 
-		using operation = ComparisonExpression;
+		struct AssignmentStatement : dsl::infix_op_single
+		{
+			static constexpr auto op = dsl::op<fz::Assignment_t>(LEXY_LIT(":="));
+			using operand = SumExpression;
+		};
 
-		//static constexpr auto whitespace = dsl::ascii::blank | (dsl::backslash >> dsl::newline);
+		struct KeywordExpression : dsl::prefix_op
+		{
+			static constexpr auto op 
+				= dsl::op<fz::PrefixKeyword::return_>(LEXY_LIT("return"))
+				/ dsl::op<fz::PrefixKeyword::let>(LEXY_LIT("let"))
+				/ dsl::op<fz::PrefixKeyword::temp>(LEXY_LIT("temp"));
+			using operand = AssignmentStatement;
+		};
+
+		using operation = KeywordExpression;
+
+		static constexpr auto whitespace = dsl::ascii::blank | (dsl::backslash >> dsl::newline);
 		
 		static constexpr auto value = lexy::callback<fz::Expression>(
 			[](fz::Expression lhs, fz::BinaryOperator op, fz::Expression rhs) -> fz::Expression {
 				return fz::BinaryOperation(lhs, op, rhs);
-			}
-			, lexy::forward< fz::Expression >
+			},
+			[](fz::PrefixKeyword kw, fz::Expression rhs) -> fz::Expression {
+				return fz::KeywordOperation(kw, rhs);
+			},
+			[](fz::Expression lhs, fz::Assignment_t, fz::Expression rhs) -> fz::Expression {
+				return fz::AssignOperation(lhs, rhs);
+			},
+			lexy::forward< fz::Expression >
 		);
 	};
 }

@@ -37,18 +37,9 @@ void testFuzz() {
 	test(u8"5+3");
 	test(u8"5+3 > (1+sqrt5)/2");
 	test(u8"myText == \"Hello, World!\"");
-	test<fuzz_grammar::AssignmentQualifier>(u8"let");
-	test<fuzz_grammar::AssignmentQualifier>(u8"temp");
-	test<fuzz_grammar::Statement>(u8"let PiByFour = 3.141592654 / 4");
-	test<fuzz_grammar::Statement>(u8"v = 3.141592654 / 4");
-	test<fuzz_grammar::Statement>(u8"temp q = 3.141592654 / 4");
-	test<fuzz_grammar::Statement>(u8"return 3+4*q");
-
-	//auto result = fuzz::AssignmentStatement{};
-	//	result.qualifier = fuzz::AssignmentQualifier::let;
-	//	result.name = parse<fuzz_grammar::Identifier>(u8"Booty");
-	//	result.expression = parse(u8"5+4");
-
+	test(u8"return 3+4*q");
+	test(u8"let myCoolStuff := 3+4*q");
+	test(u8"temp lads := 3+4*q");
 }
 
 int main() 

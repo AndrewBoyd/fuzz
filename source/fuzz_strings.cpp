@@ -40,11 +40,12 @@ namespace fuzz
 		{ BinaryOperator::logical_or, "||" },
 	};
 
-	static auto const kToString_fuzz_assignment_qualifier =
-		std::map<AssignmentQualifier, std::string>
+	static auto const kToString_fuzz_keyword_operator =
+		std::map<PrefixKeyword, std::string>
 	{
-		{ AssignmentQualifier::let, "let" },
-		{ AssignmentQualifier::temp, "temp" },
+		{ PrefixKeyword::return_, "return" },
+		{ PrefixKeyword::let, "let" },
+		{ PrefixKeyword::temp, "temp" },
 	};
 
 	std::string to_string(Boolean x) {
@@ -91,6 +92,10 @@ namespace fuzz
 			return to_string(*expr);
 		if (auto expr = dynamic_cast<BinaryOperation*>(expr_ptr))
 			return to_string(*expr);
+		if (auto expr = dynamic_cast<KeywordOperation*>(expr_ptr))
+			return to_string(*expr);
+		if (auto expr = dynamic_cast<AssignOperation*>(expr_ptr))
+			return to_string(*expr);
 
 		return "Unknown Expression";
 	}
@@ -108,41 +113,18 @@ namespace fuzz
 			to_string(x.rhs));
 	}
 
-	std::string to_string(AssignmentQualifier x)
+	std::string to_string(KeywordOperation x)
 	{
-		return kToString_fuzz_assignment_qualifier.at(x);
+		return fmt::format("{} {}", 
+			kToString_fuzz_keyword_operator.at(x.keyword),
+			to_string(x.expr));
 	}
 
-	std::string to_string(Statement x)
+	std::string to_string(AssignOperation x)
 	{
-		auto statement_ptr = x.get();
-		if (auto statement = dynamic_cast<AssignmentStatement*>(statement_ptr))
-			return to_string(*statement);
-		if (auto statement = dynamic_cast<ReturnStatement*>(statement_ptr))
-			return to_string(*statement);
-
-		return "Unknown Statement";
-	}
-
-	std::string to_string(AssignmentStatement x)
-	{
-		if (x.qualifier) 
-		{
-			return fmt::format("{} {} = {};",
-				to_string(*x.qualifier),
-				to_string(x.name),
-				to_string(x.expression));
-		}
-
-		return fmt::format("{} = {};",
-			to_string(x.name),
-			to_string(x.expression));
-	}
-
-	std::string to_string(ReturnStatement x)
-	{
-		return fmt::format("return {};",
-			to_string(x.expression));
+		return fmt::format("&{} := {}",
+			to_string(x.lhs),
+			to_string(x.rhs));
 	}
 
 	//std::string to_string(fuzz_array x) {
