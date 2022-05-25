@@ -26,8 +26,6 @@ namespace fuzz_grammar
 		};
 
 		static constexpr auto atom = [] {
-			//auto var_or_call = dsl::p<name> >> dsl::if_(paren_expr);
-
 			auto parenthesized = dsl::parenthesized(dsl::p<NestedExpression>);
 			auto primitive = dsl::p<PrimitiveExpression>;
 			return parenthesized | primitive
@@ -81,7 +79,9 @@ namespace fuzz_grammar
 
 		using operation = KeywordExpression;
 
-		static constexpr auto whitespace = dsl::ascii::blank | (dsl::backslash >> dsl::newline);
+		static constexpr auto whitespace 
+			= dsl::ascii::blank 
+			| (dsl::backslash >> dsl::newline);
 		
 		static constexpr auto value = lexy::callback<fz::Expression>(
 			[](fz::Expression lhs, fz::BinaryOperator op, fz::Expression rhs) -> fz::Expression {

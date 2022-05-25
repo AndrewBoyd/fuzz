@@ -93,9 +93,25 @@ namespace fuzz
 		return fmt::format("block: {{ {} }}", concat);
 	}
 
-	std::string to_string(Lambda)
+	std::string to_string(Lambda x)
 	{
-		return std::string();
+		auto& statements = x.block.statements;
+		auto strings = std::vector<std::string>{ };
+		strings.reserve(statements.size());
+		for (auto statement : statements) {
+			strings.push_back(to_string(statement));
+		}
+		auto concat = string_utils::concat(strings, "; ");
+
+		auto fv_strings = std::vector<std::string>{ "" };
+		for (auto fv : x.free_parameters) {
+			fv_strings.push_back(
+				string_utils::to_ascii(fv.id)
+			);
+		}
+		auto free_variables = string_utils::concat(fv_strings, "/");
+
+		return fmt::format("{}->{{ {} }}", free_variables, concat);
 	}
 
 	std::string to_string(Expression x)

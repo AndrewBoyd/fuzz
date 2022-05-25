@@ -101,9 +101,12 @@ namespace fuzz_grammar
 
 	struct Block
 	{
-		static constexpr auto seperator = dsl::trailing_sep(dsl::semicolon);
+		static constexpr auto seperator 
+			= dsl::trailing_sep(dsl::semicolon);
+
 		static constexpr auto rule
 			= dsl::curly_bracketed.list(dsl::recurse<Expression>, seperator);
+		
 		static constexpr auto value
 			= lexy::as_list< fuzz::Array >
 			>> lexy::callback<fz::Block>([] (auto statements)
@@ -112,9 +115,6 @@ namespace fuzz_grammar
 				result.statements = std::move(statements);
 				return result;
 			});
-		
-
-//		static constexpr auto value = lexy::constant<int>(3);
 	};
 
 	// TODO: Identifiers need to use the unicode database.
@@ -122,10 +122,42 @@ namespace fuzz_grammar
 	{
 		static constexpr auto rule
 			= dsl::identifier(dsl::ascii::alpha, dsl::ascii::alpha_digit_underscore);
-		static constexpr auto value 
-			= lexy::as_string<fz::String, lexy::utf8_encoding> 
+		static constexpr auto value
+			= lexy::as_string<fz::String, lexy::utf8_encoding>
 			| lexy::construct<fz::Identifier>;
 	};
+
+	struct Lambda : lexy::token_production
+	{
+		struct FreeParameters : lexy::transparent_production
+		{
+			static constexpr auto whitespace = dsl::ascii::blank;
+
+			static constexpr auto rule = []{
+				auto init = LEXY_LIT("/");
+				auto sep = dsl::sep(LEXY_LIT("/"));
+				return init >> dsl::list(dsl::p<Identifier>, sep);
+			}();
+
+			static constexpr auto value 
+				= lexy::as_list< std::vector<fz::Identifier> >;
+		};
+
+		static constexpr auto rule 
+			= dsl::peek(LEXY_LIT("/")) 
+			>> (dsl::p<FreeParameters> + dsl::p<Block>);
+
+		static constexpr auto value 
+			= lexy::callback<fz::Lambda>([] 
+			(std::vector<fz::Identifier> free_parameters, fz::Block block)
+			{
+				return fz::Lambda{
+					.free_parameters = std::move(free_parameters),
+					.block = std::move(block),
+				};
+			});
+	};
+
 
 	struct Primitive : lexy::transparent_production {
 		static constexpr auto rule
@@ -134,6 +166,7 @@ namespace fuzz_grammar
 			| dsl::p<String>
 			| dsl::p<Array>
 			| dsl::p<Block>
+			| dsl::p<Lambda>
 			| dsl::p<Identifier>;
 
 		static constexpr auto value = lexy::forward<fz::Primitive>;

@@ -47,6 +47,9 @@ void testFuzz() {
 	test(u8"[[nested]]");
 	test(u8"[{nested}]");
 	test(u8"{[nested]}");
+
+	test(u8"{ return x+y; }");
+	test(u8"/x /y { hello; return x+y } ");
 }
 
 int main() 

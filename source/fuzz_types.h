@@ -49,12 +49,12 @@ namespace fuzz
 	using Block = struct {
 		std::vector<Expression> statements;
 	};
-	using Lambda = struct {
-		std::vector<string_t> free_variables;
-		Block block;
-	};
 	using Identifier = struct {
 		string_t id;
+	};
+	using Lambda = struct {
+		std::vector<Identifier> free_parameters;
+		Block block;
 	};
 	using Primitive = std::variant<
 		Boolean,
@@ -62,7 +62,7 @@ namespace fuzz
 		String,
 		Array,
 		Block,
-		//Lambda,
+		Lambda,
 		Identifier
 	>;
 
