@@ -50,6 +50,9 @@ void testFuzz() {
 
 	test(u8"{ return x+y; }");
 	test(u8"/x /y { hello; return x+y } ");
+	test(u8"a.b$c ");
+	test(u8"a$b.c ");
+	test(u8"/x /y { return x+y } $ [3, (/x{ return x }).[4] ] ");
 }
 
 int main() 

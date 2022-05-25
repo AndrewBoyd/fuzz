@@ -49,19 +49,19 @@ namespace fuzz
 	};
 
 	std::string to_string(Boolean x) {
-		return fmt::format("boolean: {}", x);
+		return fmt::format("bool: {}", x);
 	}
 
 	std::string to_string(Number x) {
-		return fmt::format("number: {}", x);
+		return fmt::format("#: {}", x);
 	}
 
 	std::string to_string(String x) {
-		return fmt::format("string: \"{}\"", string_utils::u8_to_ascii(x));
+		return fmt::format("str: \"{}\"", string_utils::u8_to_ascii(x));
 	}
 
 	std::string to_string(Identifier x) {
-		return fmt::format("Identifier: \"{}\"", string_utils::u8_to_ascii(x.id));
+		return fmt::format("id: \"{}\"", string_utils::u8_to_ascii(x.id));
 	}
 
 	std::string to_string(Primitive x) {
@@ -125,6 +125,8 @@ namespace fuzz
 			return to_string(*expr);
 		if (auto expr = dynamic_cast<AssignOperation*>(expr_ptr))
 			return to_string(*expr);
+		if (auto expr = dynamic_cast<Evaluation*>(expr_ptr))
+			return to_string(*expr);
 
 		return "Unknown Expression";
 	}
@@ -140,6 +142,13 @@ namespace fuzz
 			kBinaryOperatorShortForm.at(x.operation),
 			to_string(x.lhs),
 			to_string(x.rhs));
+	}
+
+	std::string to_string(Evaluation x)
+	{
+		return fmt::format("({}.{})",
+				to_string(x.to_evaluate),
+				to_string(x.parameter_pack));;
 	}
 
 	std::string to_string(KeywordOperation x)

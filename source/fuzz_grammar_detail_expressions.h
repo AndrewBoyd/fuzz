@@ -32,13 +32,20 @@ namespace fuzz_grammar
 				| dsl::error<Err_ExpectedOperand>;
 		}();
 
+		struct EvaluationExpression : dsl::infix_op_left
+		{
+			static constexpr auto op
+				= dsl::op < fz::Evaluation_t > (LEXY_LIT("."));
+			using operand = dsl::atom;
+		};
+
 		struct ProductExpression : dsl::infix_op_left
 		{
 			static constexpr auto op 
 					= dsl::op<fz::BinaryOperator::multiply>(LEXY_LIT("*"))
 					/ dsl::op<fz::BinaryOperator::divide>(LEXY_LIT("/"))
 					/ dsl::op<fz::BinaryOperator::modulo>(LEXY_LIT("%"));
-			using operand = dsl::atom;
+			using operand = EvaluationExpression;
 		};
 
 		struct SumExpression : dsl::infix_op_left
@@ -77,7 +84,14 @@ namespace fuzz_grammar
 			using operand = AssignmentStatement;
 		};
 
-		using operation = KeywordExpression;
+		struct SlowEvaluationExpression : dsl::infix_op_right
+		{
+			static constexpr auto op
+				= dsl::op < fz::Evaluation_t > (LEXY_LIT("$"));
+			using operand = KeywordExpression;
+		};
+
+		using operation = SlowEvaluationExpression;
 
 		static constexpr auto whitespace 
 			= dsl::ascii::blank 
@@ -92,6 +106,9 @@ namespace fuzz_grammar
 			},
 			[](fz::Expression lhs, fz::Assignment_t, fz::Expression rhs) -> fz::Expression {
 				return fz::AssignOperation(lhs, rhs);
+			},
+			[](fz::Expression lhs, fz::Evaluation_t, fz::Expression rhs) -> fz::Expression {
+				return fz::Evaluation(lhs, rhs);
 			},
 			lexy::forward< fz::Expression >
 		);

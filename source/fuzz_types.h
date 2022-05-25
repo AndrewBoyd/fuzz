@@ -29,7 +29,8 @@ namespace fuzz
 		equal, 
 		not_equal,
 		logical_and, 
-		logical_or
+		logical_or,
+		evaluate,
 	};
 
 	enum class PrefixKeyword {
@@ -39,6 +40,7 @@ namespace fuzz
 	};
 
 	struct Assignment_t {};
+	struct Evaluation_t {};
 
 	// PRIMITIVES
 
@@ -112,11 +114,18 @@ namespace fuzz
 
 	struct Evaluation : public Expression_base
 	{
+		explicit Evaluation(Expression lhs, Expression rhs)
+			: Expression_base()
+			, to_evaluate(std::move(lhs))
+			, parameter_pack(std::move(rhs))
+		{};
+
 		Expression to_evaluate;
-		std::vector<Expression> parameter_pack;
+		Expression parameter_pack;
 	};
 
-	struct PrimitiveExpression : public Expression_base {
+	struct PrimitiveExpression : public Expression_base 
+	{
 		Primitive primitive;
 
 		auto operator<=>(PrimitiveExpression const& other) const = default;

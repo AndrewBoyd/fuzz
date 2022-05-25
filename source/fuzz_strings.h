@@ -16,6 +16,7 @@ namespace fuzz
 	std::string to_string(Expression);
 	std::string to_string(PrimitiveExpression); 
 	std::string to_string(BinaryOperation); 
+	std::string to_string(Evaluation); 
 
 	std::string to_string(KeywordOperation);
 	std::string to_string(AssignOperation);
