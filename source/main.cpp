@@ -13,10 +13,30 @@ template<typename parse_t = fuzz_grammar::Expression>
 void test(auto input_string)
 {
 	auto as_u8 = string_utils::to_u8(input_string);
-	std::cout << "testing: \"" << reinterpret_cast<char const*>(as_u8.c_str()) << "\".... " << std::endl;
+	std::cout 
+		<< "testing: \"" 
+		<< string_utils::to_ascii(input_string)
+		<< "\".... " 
+		<< std::endl;
+
 	auto result = parse<parse_t>(input_string);
 	std::cout << fuzz::to_string(result) << std::endl;
 	std::cout << std::endl;
+}
+
+void evaluate(auto input_string) 
+{
+	auto as_u8 = string_utils::to_u8(input_string);
+	std::cout 
+		<< "evaluating: \"" 
+		<< string_utils::to_ascii(input_string) 
+		<< "\".... " 
+		<< std::endl;
+
+	auto byte_code = parse<fuzz_grammar::Expression>(input_string);
+	auto context = fuzz::EvaluationContext{};
+	auto result = byte_code->evaluate(context);
+	std::cout << fuzz::to_string(result) << std::endl;
 }
 
 void testFuzz() {
@@ -41,18 +61,15 @@ void testFuzz() {
 	test(u8"let myCoolStuff := 3+4*q");
 	test(u8"temp lads := 3+4*q");
 	test(u8"[1, 2, cool_beans, 3+38]");
-	test(u8"{name; value; [3,2,1]; }");
-
-	test(u8"{{nested}}");
 	test(u8"[[nested]]");
-	test(u8"[{nested}]");
-	test(u8"{[nested]}");
 
-	test(u8"{ return x+y; }");
 	test(u8"/x /y { hello; return x+y } ");
 	test(u8"a.b$c ");
 	test(u8"a$b.c ");
 	test(u8"/x /y { return x+y } $ [3, (/x{ return x }).[4] ] ");
+
+	evaluate(u8"3+4");
+	evaluate(u8"[3,2,\"Hello\"] + [\"World\"]");
 }
 
 int main() 

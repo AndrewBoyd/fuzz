@@ -139,9 +139,9 @@ namespace fuzz
 	std::string to_string(BinaryOperation x)
 	{
 		return fmt::format("({1} {0} {2})",
-			kBinaryOperatorShortForm.at(x.operation),
-			to_string(x.lhs),
-			to_string(x.rhs));
+			kBinaryOperatorShortForm.at(x.operation_),
+			to_string(x.lhs_),
+			to_string(x.rhs_));
 	}
 
 	std::string to_string(Evaluation x)

@@ -165,7 +165,6 @@ namespace fuzz_grammar
 			| dsl::p<Number>
 			| dsl::p<String>
 			| dsl::p<Array>
-			| dsl::p<Block>
 			| dsl::p<Lambda>
 			| dsl::p<Identifier>;
 

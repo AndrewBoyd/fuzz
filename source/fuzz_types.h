@@ -4,17 +4,19 @@
 #include <variant>
 #include <vector>
 #include <string>
+#include <any>
 #include <map>
+#include <set>
 
 namespace fuzz
 {
 	using string_t = std::u8string;
-
-	struct Object_base;
-	using Object = stdish::value_ptr<Object_base>;
+	
+	class EvaluationContext;
 
 	struct Expression_base;
 	using Expression = stdish::value_ptr<Expression_base>;
+	struct PrimitiveExpression;
 
 	enum class BinaryOperator {
 		add, 
@@ -58,34 +60,54 @@ namespace fuzz
 		std::vector<Identifier> free_parameters;
 		Block block;
 	};
+
+	struct Object;
+
 	using Primitive = std::variant<
 		Boolean,
 		Number,
 		String,
 		Array,
-		Block,
 		Lambda,
+		Object,
 		Identifier
 	>;
+
+	struct Object {
+		std::map<string_t, Primitive > values;
+	};
 
 	// EXPRESSIONS
 
 	struct Expression_base{
 		virtual ~Expression_base() = default;
+		
+		virtual Primitive evaluate(EvaluationContext const &) const
+		{
+			throw "Expression does not return a value";
+		}
+		
+		virtual void execute(EvaluationContext&) const
+		{
+			throw "Expression is not a statement";
+		}
 	};
 
-	struct BinaryOperation : public Expression_base 
+	class BinaryOperation : public Expression_base 
 	{
-		explicit BinaryOperation(Expression l, BinaryOperator op, Expression r) 
+	public:
+		explicit BinaryOperation(Expression lhs, BinaryOperator op, Expression rhs) 
 			: Expression_base()
-			, operation(op)
-			, lhs(std::move(l))
-			, rhs(std::move(r))
+			, operation_(op)
+			, lhs_(std::move(lhs))
+			, rhs_(std::move(rhs))
 		{}
 
-		BinaryOperator operation;
-		Expression lhs;
-		Expression rhs;
+		Primitive evaluate(EvaluationContext const&) const override;
+
+		BinaryOperator operation_;
+		Expression lhs_;
+		Expression rhs_;
 	};
 
 	struct KeywordOperation : public Expression_base
@@ -128,8 +150,21 @@ namespace fuzz
 	{
 		Primitive primitive;
 
-		auto operator<=>(PrimitiveExpression const& other) const = default;
+		Primitive evaluate(EvaluationContext const&) const override;
 	};
 
 	using Program = Block;
+
+
+	class EvaluationContext 
+	{
+	public:
+		Primitive& get(Identifier id);
+		Primitive const & get(Identifier id) const;
+
+	private:
+		std::list<Object> context_;
+		std::set<Identifier> temp_names_;
+	};
+
 }
