@@ -3,22 +3,15 @@
 
 namespace fuzz
 {
-	class EvaluationContext 
+	struct Evaluation : public Expression_base
 	{
-	public:
+		explicit Evaluation(Expression lhs, Expression rhs)
+			: Expression_base()
+			, to_evaluate(std::move(lhs))
+			, parameter_pack(std::move(rhs))
+		{};
 
-		Primitive& get(Identifier id);
-		Primitive const & get(Identifier id) const;
-
-		void markReturned();
-		void setVariable(Identifier id, Primitive primitive);
-		TransientObject& getCurrentObject();
-
-	protected:
-		Primitive* find(Identifier id);
-		Primitive const * find(Identifier id) const;
-
-	private:
-		std::list<TransientObject> object_stack_;
+		Expression to_evaluate;
+		Expression parameter_pack;
 	};
 }

@@ -93,73 +93,16 @@ namespace fuzz
 		}
 	};
 
-	class BinaryOperation : public Expression_base 
-	{
-	public:
-		explicit BinaryOperation(Expression lhs, BinaryOperator op, Expression rhs) 
-			: Expression_base()
-			, operation_(op)
-			, lhs_(std::move(lhs))
-			, rhs_(std::move(rhs))
-		{}
-
-		Primitive evaluate(EvaluationContext const&) const override;
-
-		BinaryOperator operation_;
-		Expression lhs_;
-		Expression rhs_;
-	};
-
-	struct KeywordOperation : public Expression_base
-	{
-		explicit KeywordOperation(PrefixKeyword kw, Expression rhs)
-			: Expression_base()
-			, keyword(kw)
-			, expr(std::move(rhs)) 
-		{};
-
-		PrefixKeyword keyword;
-		Expression expr;
-	};
-
-	struct AssignOperation : public Expression_base
-	{
-		explicit AssignOperation(Expression l, Expression r)
-			: Expression_base()
-			, lhs(std::move(l))
-			, rhs(std::move(r))
-		{};
-
-		Expression lhs;
-		Expression rhs;
-	};
-
-	struct Evaluation : public Expression_base
-	{
-		explicit Evaluation(Expression lhs, Expression rhs)
-			: Expression_base()
-			, to_evaluate(std::move(lhs))
-			, parameter_pack(std::move(rhs))
-		{};
-
-		Expression to_evaluate;
-		Expression parameter_pack;
-	};
-
-	struct PrimitiveExpression : public Expression_base 
-	{
-		Primitive primitive;
-
-		Primitive evaluate(EvaluationContext const&) const override;
-	};
 
 	using Program = Block;
-
-
-	class TransientObject : public Object {
-	public:
-		std::set<Identifier> temp_names = {};
-		bool returned = false;
-	};
-
 }
+
+#include "fuzz_evaluation_context.h"
+
+#include "fuzz_evaluation.h"
+#include "fuzz_binary_operation.h"
+#include "fuzz_primitive_expression.h"
+#include "fuzz_assign_operation.h"
+#include "fuzz_keyword_operation.h"
+
+
