@@ -156,15 +156,10 @@ namespace fuzz
 	using Program = Block;
 
 
-	class EvaluationContext 
-	{
+	class TransientObject : public Object {
 	public:
-		Primitive& get(Identifier id);
-		Primitive const & get(Identifier id) const;
-
-	private:
-		std::list<Object> context_;
-		std::set<Identifier> temp_names_;
+		std::set<Identifier> temp_names = {};
+		bool returned = false;
 	};
 
 }

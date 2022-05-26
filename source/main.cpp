@@ -2,7 +2,7 @@
 #include "fuzz_types.h"
 #include "fuzz_grammar.h"
 #include "fuzz_strings.h"
-
+#include "fuzz_evaluation.h"
 #include <utility/string_utils.h>
 #include <fmt/format.h>
 #include <iostream>
