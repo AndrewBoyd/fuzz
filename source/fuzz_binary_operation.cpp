@@ -8,12 +8,22 @@ namespace fuzz
 {
 	Primitive evaluate(EvaluationContext const& context, Primitive lhs, Primitive rhs, BinaryOperator op);
 	Primitive evaluate(EvaluationContext const& context, Expression lhs, Expression rhs, BinaryOperator op);
-
+	
 	template< typename primitive_t >
 	std::string tname(primitive_t type) { return typeid(type).name(); }
 
 	template<>
 	std::string tname(Primitive) { return "Primitive"; }
+
+	template<typename primitive_t>
+	bool toBoolean_impl(primitive_t) { return false; }
+	template<>
+	bool toBoolean_impl(bool x) { return x; }
+	bool toBoolean(Primitive p) {
+		return std::visit([](auto x) { 
+			return toBoolean_impl(x);
+		}, p);
+	}
 
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
@@ -238,6 +248,96 @@ namespace fuzz
 		return Array{};
 	}
 
+
+	////////////////////////////////////////////////
+	////////////////////////////////////////////////
+	////////////////////////////////////////////////
+
+	bool lt(EvaluationContext const& context, Primitive lhs, Primitive rhs) {
+		return toBoolean(evaluate(context, lhs, rhs, BinaryOperator::less_than));
+	}
+
+	bool lt(EvaluationContext const& context, Expression lhs, Expression rhs) {
+		return lt(context, lhs->evaluate(context), rhs->evaluate(context));
+	}
+
+	bool gt(EvaluationContext const& context, auto lhs, auto rhs) {
+		return lt(context, rhs, lhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorLessThan(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		// If they aren't comparible, then obviously its not less than.
+		return false;
+	}
+
+	template<>
+	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Number lhs, Number rhs) {
+		return lhs < rhs;
+	}
+
+	template<>
+	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Array lhs, Array rhs){
+		if (lhs.size() != rhs.size())
+			return lhs.size() < rhs.size();
+
+		for (auto i = 0u; i < lhs.size(); ++i) {
+			if (lt(context, lhs[i], rhs[i])) return true;
+			if (gt(context, lhs[i], rhs[i])) return false;
+		}
+
+		return false;
+	}
+
+	template<>
+	Primitive evaluateOperatorLessThan(EvaluationContext const& context, String lhs, String rhs) {
+		return lhs < rhs;
+	}
+
+	template<>
+	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+		return lhs==false && rhs==true;
+	}
+
+	////////////////////////////////////////////////
+	////////////////////////////////////////////////
+	////////////////////////////////////////////////
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorLessThanOrEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return !gt(context, lhs, rhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorGreaterThan(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return gt(context, rhs, lhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorGreaterThanOrEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return !lt(context, lhs, rhs);
+	}
+	
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return !lt(context, lhs, rhs) && !gt(context, lhs, rhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorNotEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return lt(context, lhs, rhs) || gt(context, lhs, rhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorLogicalAnd(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return toBoolean(lhs) && toBoolean(rhs);
+	}
+
+	template<typename lhs_t, typename rhs_t>
+	Primitive evaluateOperatorLogicalOr(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+		return toBoolean(lhs) || toBoolean(rhs);
+	}
+
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
@@ -255,6 +355,24 @@ namespace fuzz
 				return evaluateOperatorMultiply(context, lhs, rhs);
 			case BinaryOperator::divide:
 				return evaluateOperatorDivide(context, lhs, rhs);
+			case BinaryOperator::modulo:
+				return evaluateOperatorModulo(context, lhs, rhs);
+			case BinaryOperator::less_than:
+				return evaluateOperatorLessThan(context, lhs, rhs);
+			case BinaryOperator::less_than_or_equal:
+				return evaluateOperatorLessThanOrEqual(context, lhs, rhs);
+			case BinaryOperator::greater_than:
+				return evaluateOperatorGreaterThan(context, lhs, rhs);
+			case BinaryOperator::greater_than_or_equal:
+				return evaluateOperatorGreaterThanOrEqual(context, lhs, rhs);
+			case BinaryOperator::equal:
+				return evaluateOperatorEqual(context, lhs, rhs);
+			case BinaryOperator::not_equal:
+				return evaluateOperatorNotEqual(context, lhs, rhs);
+			case BinaryOperator::logical_and:
+				return evaluateOperatorLogicalAnd(context, lhs, rhs);
+			case BinaryOperator::logical_or:
+				return evaluateOperatorLogicalOr(context, lhs, rhs);
 			default:
 				throw std::exception("Unknown Binary operator.");
 			}
