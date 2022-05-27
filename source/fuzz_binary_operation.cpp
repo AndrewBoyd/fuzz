@@ -12,8 +12,11 @@ namespace fuzz
 	template< typename primitive_t >
 	std::string tname(primitive_t type) { return typeid(type).name(); }
 
-	template<>
-	std::string tname(Primitive) { return "Primitive"; }
+	template<> std::string tname(Primitive) { return "Primitive"; }
+	template<> std::string tname(Array) { return "Array"; }
+	template<> std::string tname(Number) { return "Number"; }
+	template<> std::string tname(String) { return "String"; }
+	template<> std::string tname(Boolean) { return "Boolean"; }
 
 	template<typename primitive_t>
 	bool toBoolean_impl(primitive_t) { return false; }
@@ -89,6 +92,13 @@ namespace fuzz
 
 	template<>
 	Primitive evaluateOperatorSubtract(EvaluationContext const& context, String lhs, Number rhs) {
+		auto to_remove = std::min((size_t)rhs, lhs.size());
+		lhs.erase(lhs.end() - to_remove, lhs.end());
+		return lhs;
+	}
+
+	template<>
+	Primitive evaluateOperatorSubtract(EvaluationContext const& context, Array lhs, Number rhs) {
 		auto to_remove = std::min((size_t)rhs, lhs.size());
 		lhs.erase(lhs.end() - to_remove, lhs.end());
 		return lhs;
@@ -244,7 +254,7 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, Array lhs, Array rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext const& context, Array lhs, Array rhs) {
 		return Array{};
 	}
 

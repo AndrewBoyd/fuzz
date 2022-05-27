@@ -73,22 +73,39 @@ void testFuzz() {
 	evaluate(u8R"(["A", "B", "C"]*[1,2,3])");
 }
 
+void repl() {
+	auto context = fuzz::EvaluationContext{};
+
+	while (true) {
+		std::string input_string = {};
+
+		std::cout << ": ";
+		std::getline(std::cin, input_string);
+		std::cout << input_string << std::endl;
+
+		auto as_u8 = string_utils::to_u8(input_string);
+		try {
+			auto byte_code = parse<fuzz_grammar::Expression>(input_string);
+			auto result = byte_code->evaluate(context);
+			std::cout << fuzz::to_string(result) << std::endl;
+		}
+		catch (std::exception e) {
+			std::cout << "ERROR: " << std::endl;
+			std::cout << e.what() << std::endl;
+		}
+		catch (...) {
+			std::cout << "UNKNOWN ERROR. " << std::endl;
+		}
+	};
+
+}
+
 int main() 
 {
 	::SetConsoleOutputCP(CP_UTF8);
 
-	try {
-		testFuzz();
-	}
-	catch (std::exception e) {
-		std::cout << "ERROR: " << std::endl;
-		std::cout << e.what();
-		return 1;
-	}
-	catch (...) {
-		std::cout << "Unknown Error occured.";
-		return 2;
-	}
-
+	//testFuzz();
+	repl();
+	
 	return 0;
 }
