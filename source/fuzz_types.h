@@ -4,6 +4,7 @@
 #include <variant>
 #include <vector>
 #include <string>
+#include <exception>
 #include <any>
 #include <map>
 #include <set>
@@ -16,7 +17,7 @@ namespace fuzz
 
 	struct Expression_base;
 	using Expression = stdish::value_ptr<Expression_base>;
-	struct PrimitiveExpression;
+	class PrimitiveExpression;
 
 	enum class BinaryOperator {
 		add, 
@@ -32,7 +33,6 @@ namespace fuzz
 		not_equal,
 		logical_and, 
 		logical_or,
-		evaluate,
 	};
 
 	enum class PrefixKeyword {

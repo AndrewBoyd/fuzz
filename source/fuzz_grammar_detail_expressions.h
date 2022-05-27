@@ -7,9 +7,7 @@ namespace fuzz_grammar
 		static constexpr auto rule = dsl::p<Primitive>;
 		static constexpr auto value = lexy::callback<fz::Expression>([](auto p)
 		{
-			auto result = fz::PrimitiveExpression{};
-			result.primitive = std::move(p);
-			return result;
+			return fz::PrimitiveExpression(std::move(p));
 		});
 	};
 

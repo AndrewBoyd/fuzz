@@ -3,8 +3,13 @@
 
 namespace fuzz
 {
-	struct PrimitiveExpression : public Expression_base
+	class PrimitiveExpression : public Expression_base
 	{
+	public:
+		PrimitiveExpression(Primitive p)
+			: primitive(std::move(p))
+		{}
+
 		Primitive primitive;
 
 		Primitive evaluate(EvaluationContext const&) const override;

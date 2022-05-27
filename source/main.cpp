@@ -70,11 +70,25 @@ void testFuzz() {
 
 	evaluate(u8"3+4");
 	evaluate(u8"[3,2,\"Hello\"] + [\"World\"]");
+	evaluate(u8R"(["A", "B", "C"]*[1,2,3])");
 }
 
 int main() 
 {
 	::SetConsoleOutputCP(CP_UTF8);
-	testFuzz();
+
+	try {
+		testFuzz();
+	}
+	catch (std::exception e) {
+		std::cout << "ERROR: " << std::endl;
+		std::cout << e.what();
+		return 1;
+	}
+	catch (...) {
+		std::cout << "Unknown Error occured.";
+		return 2;
+	}
+
 	return 0;
 }
