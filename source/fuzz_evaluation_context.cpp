@@ -3,18 +3,22 @@
 
 namespace fuzz 
 {
-	Primitive& EvaluationContext::get(Identifier id) 
+	EvaluationContext::EvaluationContext()
+	{
+		object_stack_.push_front(TransientObject{});
+	}
+
+	Primitive& EvaluationContext::get(Identifier id)
 	{
 		if (auto* found = find(id))
 			return *found;
-		throw "Unknown identifier " + string_utils::to_ascii(id.id);
+		auto exception_string = "Unknown identifier " + string_utils::to_ascii(id.id);
+		throw std::exception(exception_string.c_str());
 	}
 
 	Primitive const& EvaluationContext::get(Identifier id) const 
 	{
-		if (auto* found = find(id))
-			return *found;
-		throw "Unknown identifier " + string_utils::to_ascii(id.id);
+		return (const_cast<EvaluationContext*>(this))->get(id);
 	}
 
 	void EvaluationContext::markReturned()
@@ -40,7 +44,7 @@ namespace fuzz
 	Primitive* EvaluationContext::find(Identifier id)
 	{
 		// TODO: Fuzzy Matching
-		for (auto object : object_stack_)
+		for (auto& object : object_stack_)
 		{
 			auto& values = object.values;
 			if (auto found_it = values.find(id.id);

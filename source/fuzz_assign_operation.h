@@ -11,6 +11,9 @@ namespace fuzz
 			, rhs(std::move(r))
 		{};
 
+		bool canExecute() const override { return true; };
+		void execute(EvaluationContext&) const override;
+
 		Expression lhs;
 		Expression rhs;
 	};

@@ -74,27 +74,39 @@ void testFuzz() {
 }
 
 void repl() {
-	auto context = fuzz::EvaluationContext{};
+	auto context = fuzz::EvaluationContext();
 
 	while (true) {
-		std::string input_string = {};
-
 		std::cout << ": ";
+
+		std::string input_string = {};
 		std::getline(std::cin, input_string);
-		std::cout << input_string << std::endl;
+		//std::cout << input_string << std::endl;
 
 		auto as_u8 = string_utils::to_u8(input_string);
 		try {
 			auto byte_code = parse<fuzz_grammar::Expression>(input_string);
-			auto result = byte_code->evaluate(context);
-			std::cout << fuzz::to_string(result) << std::endl;
+
+			std::cout << fuzz::to_string(byte_code) << std::endl;
+
+			if (byte_code->canExecute()) {
+				byte_code->execute(context);
+			}
+			else {
+				auto result = byte_code->evaluate(context);
+				std::cout << fuzz::to_string(result) << std::endl;
+			}
 		}
 		catch (std::exception e) {
-			std::cout << "ERROR: " << std::endl;
-			std::cout << e.what() << std::endl;
+			std::cout 
+				<< "ERROR: " 
+				<< e.what() 
+				<< std::endl;
 		}
 		catch (...) {
-			std::cout << "UNKNOWN ERROR. " << std::endl;
+			std::cout 
+				<< "UNKNOWN ERROR. " 
+				<< std::endl;
 		}
 	};
 

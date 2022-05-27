@@ -12,6 +12,7 @@ namespace fuzz
 	class EvaluationContext 
 	{
 	public:
+		EvaluationContext();
 
 		Primitive& get(Identifier id);
 		Primitive const & get(Identifier id) const;

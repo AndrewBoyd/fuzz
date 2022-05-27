@@ -16,7 +16,7 @@ namespace fuzz
 	{
 		return std::visit([&context](auto primitive) {
 			return evaluatePrimitive(context, primitive);
-			}, primitive);
+		}, primitive);
 	}
 }
 

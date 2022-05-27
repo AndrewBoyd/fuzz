@@ -84,13 +84,18 @@ namespace fuzz
 		
 		virtual Primitive evaluate(EvaluationContext const &) const
 		{
-			throw "Expression does not return a value";
+			throw std::exception("Expression does not return a value");
 		}
-		
+
 		virtual void execute(EvaluationContext&) const
 		{
-			throw "Expression is not a statement";
+			throw std::exception("Expression is not a statement");
 		}
+
+		virtual bool canExecute() const
+		{
+			return false;
+		};
 	};
 
 
