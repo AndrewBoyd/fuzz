@@ -136,7 +136,7 @@ namespace fuzz_grammar
 			static constexpr auto rule = []{
 				auto init = LEXY_LIT("/");
 				auto sep = dsl::sep(LEXY_LIT("/"));
-				return init >> dsl::list(dsl::p<Identifier>, sep);
+				return init >> dsl::opt( dsl::list(dsl::p<Identifier>, sep) );
 			}();
 
 			static constexpr auto value 
@@ -147,12 +147,16 @@ namespace fuzz_grammar
 			= dsl::peek(LEXY_LIT("/")) 
 			>> (dsl::p<FreeParameters> + dsl::p<Block>);
 
-		static constexpr auto value 
-			= lexy::callback<fz::Lambda>([] 
-			(std::vector<fz::Identifier> free_parameters, fz::Block block)
+		static constexpr auto value
+			= lexy::callback<fz::Lambda>([]
+			(std::optional< std::vector<fz::Identifier> > free_parameters, fz::Block block)
 			{
+				auto fp = free_parameters
+					? *std::move(free_parameters)
+					: std::vector < fz::Identifier>{};
+
 				return fz::Lambda{
-					.free_parameters = std::move(free_parameters),
+					.free_parameters = std::move(fp),
 					.block = std::move(block),
 				};
 			});

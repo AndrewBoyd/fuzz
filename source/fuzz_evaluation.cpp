@@ -11,6 +11,9 @@ namespace fuzz
 	template <typename primitive_t>
 	Lambda bindParameter(Lambda const& f, primitive_t x)
 	{
+		if (f.free_parameters.empty())
+			throw std::exception("Attempting to bind to a function with no free parameters");
+
 		auto g = f;
 		auto& free = g.free_parameters;
 		auto& bound = g.bound_parameters;
@@ -20,6 +23,7 @@ namespace fuzz
 		free = std::vector<Identifier>(free.begin() + 1, free.end());
 		return g;
 	}
+
 
 	Primitive executeFunction(EvaluationContext & context, Lambda const & f) 
 	{
@@ -33,6 +37,18 @@ namespace fuzz
 		}
 		
 		return context.popObject();
+	}
+
+	template <typename primitive_t>
+	void maybeExecuteVoidFunction(EvaluationContext& context, primitive_t const& f, Primitive & result_t ) {
+
+	}
+
+	template <>
+	void maybeExecuteVoidFunction(EvaluationContext& context, Lambda const& f, Primitive& result) {
+		if (f.free_parameters.empty()) {
+			result = executeFunction(context, f);
+		}
 	}
 
 	////////////////////////////////////////////
@@ -49,6 +65,9 @@ namespace fuzz
 	Primitive evaluation(EvaluationContext& context, primitive_t f, Array xs)
 	{
 		auto result = Primitive(f);
+
+		maybeExecuteVoidFunction(context, f, result);
+
 		for (auto x : xs)
 		{
 			auto x_eval = x->evaluate(context);
@@ -95,6 +114,11 @@ namespace fuzz
 		auto modded = fmod(x, arr.size());
 		auto index = static_cast<size_t>(std::round(x));
 		return arr.at(index)->evaluate( context );
+	}
+
+	Primitive evaluation(EvaluationContext& context, Array arr, bool x)
+	{
+		return evaluation(context, arr, (Number)x);
 	}
 
 	Primitive evaluation(EvaluationContext& context, Object obj, String member)
