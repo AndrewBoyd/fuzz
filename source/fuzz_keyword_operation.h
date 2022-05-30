@@ -12,6 +12,8 @@ namespace fuzz
 			, expr(std::move(rhs))
 		{};
 
+		void execute( EvaluationContext & ) const override;
+
 		PrefixKeyword keyword;
 		Expression expr;
 	};

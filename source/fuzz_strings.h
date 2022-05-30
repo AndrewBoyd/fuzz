@@ -12,6 +12,7 @@ namespace fuzz
 	std::string to_string(Array);
 	std::string to_string(Block);
 	std::string to_string(Lambda);
+	std::string to_string(Object);
 
 	std::string to_string(Expression);
 	std::string to_string(PrimitiveExpression); 

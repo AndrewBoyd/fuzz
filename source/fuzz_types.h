@@ -105,13 +105,13 @@ namespace fuzz
 	using Program = Block;
 
 
-	template< typename primitive_t >
+	template< typename primitive_t > inline
 	std::string tname(primitive_t type) { return typeid(type).name(); }
-	template<> std::string tname(Primitive) { return "Primitive"; }
-	template<> std::string tname(Array) { return "Array"; }
-	template<> std::string tname(Number) { return "Number"; }
-	template<> std::string tname(String) { return "String"; }
-	template<> std::string tname(Boolean) { return "Boolean"; }
+	template<> inline std::string tname(Primitive) { return "Primitive"; }
+	template<> inline std::string tname(Array) { return "Array"; }
+	template<> inline std::string tname(Number) { return "Number"; }
+	template<> inline std::string tname(String) { return "String"; }
+	template<> inline std::string tname(Boolean) { return "Boolean"; }
 }
 
 #include "fuzz_evaluation_context.h"

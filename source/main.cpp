@@ -89,7 +89,7 @@ void repl() {
 		try {
 			auto byte_code = parse<fuzz_grammar::Expression>(input_string);
 
-			std::cout << fuzz::to_string(byte_code) << std::endl;
+			//std::cout << fuzz::to_string(byte_code) << std::endl;
 
 			if (byte_code->canExecute()) {
 				byte_code->execute(context);

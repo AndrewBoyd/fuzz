@@ -114,6 +114,18 @@ namespace fuzz
 		return fmt::format("{}->{{ {} }}", free_variables, concat);
 	}
 
+	std::string to_string(Object x)
+	{
+		auto& values = x.values;
+		auto strings = std::vector<std::string>{ };
+		strings.reserve(values.size());
+		for (auto &[id, value] : values) {
+			strings.push_back(string_utils::to_ascii(id));
+		}
+		auto concat = string_utils::concat(strings, ", ");
+		return fmt::format("Object: {{ {} }}", concat);
+	}
+
 	std::string to_string(Expression x)
 	{
 		auto expr_ptr = x.get();

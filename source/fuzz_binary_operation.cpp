@@ -383,7 +383,7 @@ namespace fuzz
 			default:
 				throw std::exception("Unknown Binary operator.");
 			}
-			}, lhs, rhs);
+		}, lhs, rhs);
 	}
 
 	Primitive evaluate(EvaluationContext & context, Expression lhs, Expression rhs, BinaryOperator op)
