@@ -6,7 +6,7 @@ namespace fuzz
 	class TransientObject : public Object {
 	public:
 		std::set<Identifier> temp_names = {};
-		bool returned = false;
+		std::optional<Primitive> returned_value = {};
 	};
 	
 	class EvaluationContext 
@@ -17,9 +17,12 @@ namespace fuzz
 		Primitive& get(Identifier id);
 		Primitive const & get(Identifier id) const;
 
-		void markReturned();
+		void returnPrimitive(Primitive primitive);
 		void setVariable(Identifier id, Primitive primitive);
 		TransientObject& getCurrentObject();
+
+		void pushObject(Object object);
+		Primitive popObject();
 
 	protected:
 		Primitive* find(Identifier id);

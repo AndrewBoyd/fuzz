@@ -83,6 +83,8 @@ void repl() {
 		std::getline(std::cin, input_string);
 		//std::cout << input_string << std::endl;
 
+		if (input_string.empty()) continue;
+
 		auto as_u8 = string_utils::to_u8(input_string);
 		try {
 			auto byte_code = parse<fuzz_grammar::Expression>(input_string);

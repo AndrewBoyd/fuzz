@@ -11,6 +11,8 @@ namespace fuzz
 			, parameter_pack(std::move(rhs))
 		{};
 
+		Primitive evaluate(EvaluationContext &) const override;
+
 		Expression to_evaluate;
 		Expression parameter_pack;
 	};

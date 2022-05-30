@@ -56,11 +56,8 @@ namespace fuzz
 	using Identifier = struct {
 		string_t id;
 	};
-	using Lambda = struct {
-		std::vector<Identifier> free_parameters;
-		Block block;
-	};
 
+	struct Lambda;
 	struct Object;
 
 	using Primitive = std::variant<
@@ -77,12 +74,18 @@ namespace fuzz
 		std::map<string_t, Primitive > values;
 	};
 
+	struct Lambda {
+		std::vector<Identifier> free_parameters;
+		Object bound_parameters;
+		Block block;
+	};
+
 	// EXPRESSIONS
 
 	struct Expression_base{
 		virtual ~Expression_base() = default;
 		
-		virtual Primitive evaluate(EvaluationContext const &) const
+		virtual Primitive evaluate(EvaluationContext&) const
 		{
 			throw std::exception("Expression does not return a value");
 		}
@@ -100,6 +103,15 @@ namespace fuzz
 
 
 	using Program = Block;
+
+
+	template< typename primitive_t >
+	std::string tname(primitive_t type) { return typeid(type).name(); }
+	template<> std::string tname(Primitive) { return "Primitive"; }
+	template<> std::string tname(Array) { return "Array"; }
+	template<> std::string tname(Number) { return "Number"; }
+	template<> std::string tname(String) { return "String"; }
+	template<> std::string tname(Boolean) { return "Boolean"; }
 }
 
 #include "fuzz_evaluation_context.h"

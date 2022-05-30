@@ -6,22 +6,19 @@
 
 namespace fuzz 
 {
-	Primitive evaluate(EvaluationContext const& context, Primitive lhs, Primitive rhs, BinaryOperator op);
-	Primitive evaluate(EvaluationContext const& context, Expression lhs, Expression rhs, BinaryOperator op);
-	
-	template< typename primitive_t >
-	std::string tname(primitive_t type) { return typeid(type).name(); }
-
-	template<> std::string tname(Primitive) { return "Primitive"; }
-	template<> std::string tname(Array) { return "Array"; }
-	template<> std::string tname(Number) { return "Number"; }
-	template<> std::string tname(String) { return "String"; }
-	template<> std::string tname(Boolean) { return "Boolean"; }
+	Primitive evaluate(EvaluationContext & context, Primitive lhs, Primitive rhs, BinaryOperator op);
+	Primitive evaluate(EvaluationContext & context, Expression lhs, Expression rhs, BinaryOperator op);
 
 	template<typename primitive_t>
-	bool toBoolean_impl(primitive_t) { return false; }
+	bool toBoolean_impl(primitive_t) { 
+		return false; 
+	}
+
 	template<>
-	bool toBoolean_impl(bool x) { return x; }
+	bool toBoolean_impl(bool x) { 
+		return x; 
+	}
+	
 	bool toBoolean(Primitive p) {
 		return std::visit([](auto x) { 
 			return toBoolean_impl(x);
@@ -33,39 +30,39 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		auto error_description = fmt::format("incompatible type: {} + {}",
 			tname(lhs), tname(rhs));
 		throw std::exception(error_description.c_str());
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, Number lhs, Number rhs) {
 		return lhs + rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, String lhs, String rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, String lhs, String rhs) {
 		return lhs + rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, String lhs, Number rhs) {
-		return lhs + string_utils::to_u8(fmt::format("{.2f}", rhs));
+	Primitive evaluateOperatorAdd(EvaluationContext & context, String lhs, Number rhs) {
+		return lhs + string_utils::to_u8(fmt::format("{:.2f}", rhs));
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, String lhs, Boolean rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, String lhs, Boolean rhs) {
 		return lhs + string_utils::to_u8(fmt::format("{}", rhs));
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return static_cast<Boolean>( lhs ^ rhs );
 	}
 
 	template<>
-	Primitive evaluateOperatorAdd(EvaluationContext const& context, Array lhs, Array rhs) {
+	Primitive evaluateOperatorAdd(EvaluationContext & context, Array lhs, Array rhs) {
 		 lhs.insert(lhs.end(), rhs.begin(), rhs.end());
 		 return lhs;
 	}
@@ -74,38 +71,38 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		auto error_description = fmt::format("incompatible type: {} - {}",
 			tname(lhs), tname(rhs));
 		throw std::exception(error_description.c_str());
 	}
 
 	template<>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, Number lhs, Number rhs) {
 		return lhs - rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, String lhs, String rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, String lhs, String rhs) {
 		return lhs + u8"-" + rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, String lhs, Number rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, String lhs, Number rhs) {
 		auto to_remove = std::min((size_t)rhs, lhs.size());
 		lhs.erase(lhs.end() - to_remove, lhs.end());
 		return lhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, Array lhs, Number rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, Array lhs, Number rhs) {
 		auto to_remove = std::min((size_t)rhs, lhs.size());
 		lhs.erase(lhs.end() - to_remove, lhs.end());
 		return lhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorSubtract(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorSubtract(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return static_cast<Boolean>(lhs ^ rhs);
 	}
 
@@ -114,19 +111,19 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		auto error_description = fmt::format("incompatible type: {} * {}",
 			tname(lhs), tname(rhs));
 		throw std::exception(error_description.c_str());
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Number lhs, Number rhs) {
 		return lhs * rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Array lhs, Number rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Array lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		if (as_int != rhs)
 			return Array{};
@@ -136,12 +133,12 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Number lhs, Array rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Number lhs, Array rhs) {
 		return evaluateOperatorMultiply(context, rhs, lhs);
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, String lhs, Number rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, String lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		if (as_int != rhs)
 			return Array{};
@@ -151,17 +148,17 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Number lhs, String rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Number lhs, String rhs) {
 		return evaluateOperatorMultiply(context, rhs, lhs);
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return lhs && rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorMultiply(EvaluationContext const& context, Array lhs, Array rhs) {
+	Primitive evaluateOperatorMultiply(EvaluationContext & context, Array lhs, Array rhs) {
 		auto result = Array{};
 		for (auto &l : lhs) {
 			auto inner_array = Array{};
@@ -179,19 +176,19 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		auto error_description = fmt::format("incompatible type: {} / {}",
 			tname(lhs), tname(rhs));
 		throw std::exception(error_description.c_str());
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, Number lhs, Number rhs) {
 		return lhs / rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, Array lhs, Number rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, Array lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		auto snip = lhs.size() / as_int;
 		lhs.erase(lhs.begin() + snip, lhs.end());
@@ -199,7 +196,7 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, String lhs, Number rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, String lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		auto snip = lhs.size() / as_int;
 		lhs.erase(lhs.begin() + snip, lhs.end());
@@ -207,12 +204,12 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return lhs == rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorDivide(EvaluationContext const& context, Array lhs, Array rhs) {
+	Primitive evaluateOperatorDivide(EvaluationContext & context, Array lhs, Array rhs) {
 		return Array{};
 	}
 
@@ -221,19 +218,19 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		auto error_description = fmt::format("incompatible type: {} % {}",
 			tname(lhs), tname(rhs));
 		throw std::exception(error_description.c_str());
 	}
 
 	template<>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, Number lhs, Number rhs) {
 		return std::fmod(lhs, rhs);
 	}
 
 	template<>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, Array lhs, Number rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, Array lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		auto snip = lhs.size() / as_int;
 		lhs.erase(lhs.begin(), lhs.begin() + snip);
@@ -241,7 +238,7 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, String lhs, Number rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, String lhs, Number rhs) {
 		auto as_int = static_cast<int>(rhs);
 		auto snip = lhs.size() / as_int;
 		lhs.erase(lhs.begin(), lhs.begin() + snip);
@@ -249,12 +246,12 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return lhs != rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorModulo(EvaluationContext const& context, Array lhs, Array rhs) {
+	Primitive evaluateOperatorModulo(EvaluationContext & context, Array lhs, Array rhs) {
 		return Array{};
 	}
 
@@ -263,31 +260,31 @@ namespace fuzz
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
 
-	bool lt(EvaluationContext const& context, Primitive lhs, Primitive rhs) {
+	bool lt(EvaluationContext & context, Primitive lhs, Primitive rhs) {
 		return toBoolean(evaluate(context, lhs, rhs, BinaryOperator::less_than));
 	}
 
-	bool lt(EvaluationContext const& context, Expression lhs, Expression rhs) {
+	bool lt(EvaluationContext & context, Expression lhs, Expression rhs) {
 		return lt(context, lhs->evaluate(context), rhs->evaluate(context));
 	}
 
-	bool gt(EvaluationContext const& context, auto lhs, auto rhs) {
+	bool gt(EvaluationContext & context, auto lhs, auto rhs) {
 		return lt(context, rhs, lhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorLessThan(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorLessThan(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		// If they aren't comparible, then obviously its not less than.
 		return false;
 	}
 
 	template<>
-	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Number lhs, Number rhs) {
+	Primitive evaluateOperatorLessThan(EvaluationContext & context, Number lhs, Number rhs) {
 		return lhs < rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Array lhs, Array rhs){
+	Primitive evaluateOperatorLessThan(EvaluationContext & context, Array lhs, Array rhs){
 		if (lhs.size() != rhs.size())
 			return lhs.size() < rhs.size();
 
@@ -300,12 +297,12 @@ namespace fuzz
 	}
 
 	template<>
-	Primitive evaluateOperatorLessThan(EvaluationContext const& context, String lhs, String rhs) {
+	Primitive evaluateOperatorLessThan(EvaluationContext & context, String lhs, String rhs) {
 		return lhs < rhs;
 	}
 
 	template<>
-	Primitive evaluateOperatorLessThan(EvaluationContext const& context, Boolean lhs, Boolean rhs) {
+	Primitive evaluateOperatorLessThan(EvaluationContext & context, Boolean lhs, Boolean rhs) {
 		return lhs==false && rhs==true;
 	}
 
@@ -314,37 +311,37 @@ namespace fuzz
 	////////////////////////////////////////////////
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorLessThanOrEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorLessThanOrEqual(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return !gt(context, lhs, rhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorGreaterThan(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorGreaterThan(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return gt(context, rhs, lhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorGreaterThanOrEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorGreaterThanOrEqual(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return !lt(context, lhs, rhs);
 	}
 	
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorEqual(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return !lt(context, lhs, rhs) && !gt(context, lhs, rhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorNotEqual(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorNotEqual(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return lt(context, lhs, rhs) || gt(context, lhs, rhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorLogicalAnd(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorLogicalAnd(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return toBoolean(lhs) && toBoolean(rhs);
 	}
 
 	template<typename lhs_t, typename rhs_t>
-	Primitive evaluateOperatorLogicalOr(EvaluationContext const& context, lhs_t lhs, rhs_t rhs) {
+	Primitive evaluateOperatorLogicalOr(EvaluationContext & context, lhs_t lhs, rhs_t rhs) {
 		return toBoolean(lhs) || toBoolean(rhs);
 	}
 
@@ -352,7 +349,7 @@ namespace fuzz
 	////////////////////////////////////////////////
 	////////////////////////////////////////////////
 
-	Primitive evaluate(EvaluationContext const& context, Primitive lhs, Primitive rhs, BinaryOperator op)
+	Primitive evaluate(EvaluationContext & context, Primitive lhs, Primitive rhs, BinaryOperator op)
 	{
 		return std::visit([&context, op](auto lhs, auto rhs) {
 			switch (op)
@@ -389,14 +386,14 @@ namespace fuzz
 			}, lhs, rhs);
 	}
 
-	Primitive evaluate(EvaluationContext const& context, Expression lhs, Expression rhs, BinaryOperator op)
+	Primitive evaluate(EvaluationContext & context, Expression lhs, Expression rhs, BinaryOperator op)
 	{
 		auto l = lhs->evaluate(context);
 		auto r = rhs->evaluate(context);
 		return evaluate(context, l, r, op);
 	}
 
-	Primitive BinaryOperation::evaluate(EvaluationContext const& context) const
+	Primitive BinaryOperation::evaluate(EvaluationContext & context) const
 	{
 		return fuzz::evaluate(context, lhs_, rhs_, operation_);
 	}

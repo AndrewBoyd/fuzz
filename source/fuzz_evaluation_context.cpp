@@ -21,9 +21,9 @@ namespace fuzz
 		return (const_cast<EvaluationContext*>(this))->get(id);
 	}
 
-	void EvaluationContext::markReturned()
+	void EvaluationContext::returnPrimitive(Primitive primitive)
 	{
-		getCurrentObject().returned = true;
+		getCurrentObject().returned_value = primitive;
 	}
 
 	void EvaluationContext::setVariable(Identifier id, Primitive primitive)
@@ -41,6 +41,29 @@ namespace fuzz
 		return object_stack_.front();
 	}
 
+	void EvaluationContext::pushObject(Object object)
+	{
+		object_stack_.push_front(TransientObject(std::move(object)));
+	}
+
+	Primitive EvaluationContext::popObject()
+	{
+		auto result = object_stack_.front();
+		object_stack_.pop_front();
+
+		if (result.returned_value)
+			return *result.returned_value;
+
+		auto& vs = result.values;
+		for (auto temp_name : result.temp_names) {
+			if (vs.find(temp_name.id) != vs.end()) {
+				vs.erase(temp_name.id);
+			}
+		}
+		
+		return static_cast<Object&>(result);
+	}
+
 	Primitive* EvaluationContext::find(Identifier id)
 	{
 		// TODO: Fuzzy Matching
@@ -55,6 +78,7 @@ namespace fuzz
 		}
 		return nullptr;
 	}
+
 	Primitive const* EvaluationContext::find(Identifier id) const 
 	{
 		// Don't want to type this all again :)

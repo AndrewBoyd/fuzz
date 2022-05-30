@@ -10,7 +10,7 @@ namespace fuzz
 			: primitive(std::move(p))
 		{}
 
-		Primitive evaluate(EvaluationContext const&) const override;
+		Primitive evaluate(EvaluationContext &) const override;
 
 		Primitive primitive;
 	};

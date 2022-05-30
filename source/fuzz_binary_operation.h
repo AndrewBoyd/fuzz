@@ -13,7 +13,7 @@ namespace fuzz
 			, rhs_(std::move(rhs))
 		{}
 
-		Primitive evaluate(EvaluationContext const&) const override;
+		Primitive evaluate(EvaluationContext &) const override;
 
 		BinaryOperator operation_;
 		Expression lhs_;
