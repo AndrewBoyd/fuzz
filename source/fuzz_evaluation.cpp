@@ -1,6 +1,9 @@
 #include "fuzz_evaluation.h"
 #include <fmt/format.h>
 
+#include "fuzz_strings.h"
+#include <iostream>
+
 namespace fuzz 
 {
 
@@ -128,6 +131,8 @@ namespace fuzz
 
 	Primitive evaluateRecursive(EvaluationContext& context, Primitive lhs, Primitive rhs)
 	{
+		std::cout << fmt::format("Evaluating {}.{}", to_string(lhs), to_string(rhs)) << std::endl;
+
 		return std::visit([&context](auto lhs, auto rhs)
 		{
 			return evaluation(context, lhs, rhs);

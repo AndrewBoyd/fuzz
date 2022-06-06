@@ -70,7 +70,7 @@ namespace fuzz_grammar
 		struct AssignmentStatement : dsl::infix_op_single
 		{
 			static constexpr auto op = dsl::op<fz::Assignment_t>(LEXY_LIT(":="));
-			using operand = SumExpression;
+			using operand = ComparisonExpression;
 		};
 
 		struct KeywordExpression : dsl::prefix_op
