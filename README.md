@@ -2,7 +2,7 @@
 
 (Under active development - very incomplete)
 
-Fuzz is a new language that is a Functional Object-Oriented (This style referred henceforth to as "foo"), and does neither functional nor objecto oriented programming well.
+Fuzz is a new Functional Object-Oriented (This style referred henceforth to as "foo") Language, and does neither Functional nor Object-Oriented programming well.
 
 ## Fuzzy Matching: Automatic error detection
 
